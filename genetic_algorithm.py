@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def create_pop(pop_size=10, gene_num=10):
+def create_pop(pop_size=10, gene_num=10): #Creates a random population with given shape:
     population = np.random.randint(0, 2, gene_num*pop_size)
     population = population.reshape((pop_size, gene_num))
     total = 0
@@ -15,7 +15,7 @@ def create_pop(pop_size=10, gene_num=10):
     return population
 
 
-def cal_fitness(population):
+def cal_fitness(population): #Calculates fitness values of every individual in population:
     totals = np.sum(population, axis=1)
     indices = np.argsort(totals)
     fitness = np.array([])
@@ -28,14 +28,14 @@ def cal_fitness(population):
     return fitness, indices
 
 
-def roulette_wheel(fitness):
+def roulette_wheel(fitness): #Selects a value from fitness values using roulette wheel method:
     rand = np.random.random_sample()
     for i in fitness:
         if rand <= i:
             return i
 
 
-def select_parents(population, fitness, indices):
+def select_parents(population, fitness, indices): #Using roulette_wheel function, selects 2 parents:
     parents = np.array([], dtype=int)
     rand = [roulette_wheel(fitness), roulette_wheel(fitness)]
     while rand[0] == rand[1]:
@@ -45,7 +45,7 @@ def select_parents(population, fitness, indices):
     return population[indices[parents[0]]], parents[0], population[indices[parents[1]]], parents[1]
 
 
-def crossover(p1, p2, gene_num=10):
+def crossover(p1, p2, gene_num=10): #Using select_parents function, creates 2 childs:
     num_crossover = np.random.randint(1, 4)
     c1, c2 = p1, p2
     for _ in range(num_crossover):
@@ -55,7 +55,7 @@ def crossover(p1, p2, gene_num=10):
     return c1, c2
 
 
-def mutation(c1, c2, gene_num=10):
+def mutation(c1, c2, gene_num=10): #Mutates childs that created in crossover fuction with 0,3 mutation probability:
     mutation_probability = 0.3
     for i in range(gene_num):
         for j in c1, c2:
@@ -67,7 +67,7 @@ def mutation(c1, c2, gene_num=10):
     return c1, c2
 
 
-def iteration(num_iteration=1000):
+def iteration(num_iteration=1000): #Finds optimum value with 1000 iteration
     population = create_pop()
     for _ in range(1, num_iteration+1):
 
@@ -79,7 +79,7 @@ def iteration(num_iteration=1000):
         p1_total, p2_total = np.sum(p1), np.sum(p2)
         c1_total, c2_total = np.sum(c1), np.sum(c2)
 
-        if c1_total > c2_total:  # When child1 is better than child2:
+        if c1_total > c2_total:  #When child1 is better than child2:
             if p1_total > p2_total:
                 if c1_total > p1_total or c1_total == p1_total:
                     population[indices[p1_indice]] = c1
@@ -103,7 +103,7 @@ def iteration(num_iteration=1000):
                 elif c1_total > p1_total or c1_total == p1_total:
                     population[indices[p1_indice]] = c1
 
-        elif c1_total < c2_total:  # When child2 is better than child1:
+        elif c1_total < c2_total:  #When child2 is better than child1:
             if p1_total > p2_total:
                 if c2_total > p1_total or c2_total == p1_total:
                     population[indices[p1_indice]] = c2
@@ -127,7 +127,7 @@ def iteration(num_iteration=1000):
                 elif c2_total > p2_total or c2_total == p2_total:
                     population[indices[p2_indice]] = c2
 
-        elif c1_total == c2_total:  # When child1 and child2 both equally good:
+        elif c1_total == c2_total:  #When child1 and child2 both equally good:
             if p1_total > p2_total:
                 if c1_total > p1_total or c1_total == p1_total:
                     population[indices[p1_indice]] = c1
