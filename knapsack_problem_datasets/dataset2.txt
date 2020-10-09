@@ -1,0 +1,6 @@
+Knapsack Capacity: 26
+Item Weights: 12, 7, 11, 8, 9
+Item Profits: 24, 13, 23, 15, 16
+Solution: 0, 1, 1, 1, 0
+
+Source: https://people.sc.fsu.edu/~jburkardt/datasets/knapsack_01/knapsack_01.html
