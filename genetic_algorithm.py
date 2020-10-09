@@ -70,8 +70,8 @@ def mutation(c1, c2, gene_num):
     return c1, c2
 
 
-# Finds optimum value with 5000 iteration
-def iteration(num_iteration=5000):
+# Finds optimum value with given iteration number:
+def iteration(num_iteration):
     population = create_pop(8, 20)
     for _ in range(num_iteration):
         fitness, indices = cal_fitness(population)
@@ -154,4 +154,4 @@ def iteration(num_iteration=5000):
     return optimum
 
 
-optimum = iteration()
+optimum = iteration(5000)
