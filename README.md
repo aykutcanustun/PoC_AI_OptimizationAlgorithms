@@ -5,3 +5,7 @@
 
 ## Sample Output of ga_knapsack_problem.py: <br/>
 ![output](https://github.com/aykutcanustun/PoC_AI_OptimizationAlgorithms/blob/main/images_for_README.md/image2.png) <br/>
+
+
+## Sample Output of ga_travelling_salesman.py: <br/>
+![output](https://github.com/aykutcanustun/PoC_AI_OptimizationAlgorithms/blob/main/images_for_README.md/image3.png) <br/>
