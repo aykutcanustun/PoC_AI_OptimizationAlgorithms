@@ -60,100 +60,87 @@ def mutation(offsprings):
     return offsprings
 
 
-# Finds optimum values with given iteration number:
-def iteration(num_iteration):
-    population = create_pop(10, items.shape[1])
-
-    # If you want to see randomly created populations statistics, uncomment following lines. 
-    # fitness = cal_fitness(items[0], items[1], population, capacity)[0]
-    # optimum = population[np.where(fitness == np.max(fitness))[0][0]]
-    # value = np.sum(optimum * items[0])
-    # weight = np.sum(optimum * items[1])
-    # print("Unoptimised Population:\n", population)
-    # print("Unoptimised Optimum Chromosome:", optimum, "\nTotal Value:", value, "\nTotal Weight:", weight)
-
-    for _ in range(num_iteration):
-        fitness, indices = cal_fitness(items[0], items[1], population, capacity)
-        parents, parent_indices = selection(fitness, population)
-        parent_fitness = cal_fitness(items[0], items[1], parents, capacity)[0]
-        offsprings = crossover(parents)
-        offsprings = mutation(offsprings)
-        offspring_fitness = cal_fitness(items[0], items[1], offsprings, capacity)[0]
-
-        if offspring_fitness[0] > offspring_fitness[1]:  # When offspring1 is better than offspring2:
-            if parent_fitness[0] > parent_fitness[1]:
-                if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-                    if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
-                        population[indices[parent_indices[1]]] = offsprings[1]
-                elif offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
-                    population[indices[parent_indices[1]]] = offsprings[0]
-            elif parent_fitness[0] < parent_fitness[1]:
-                if offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
-                    population[indices[parent_indices[1]]] = offsprings[0]
-                    if offspring_fitness[1] > parent_fitness[0] or offspring_fitness[1] == parent_fitness[0]:
-                        population[indices[parent_indices[0]]] = offsprings[1]
-                elif offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-            elif parent_fitness[0] == parent_fitness[1]:
-                if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-                    population[indices[parent_indices[1]]] = offsprings[1]
-                elif offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-
-        elif offspring_fitness[0] < offspring_fitness[1]:  # When offspring2 is better than offspring1:
-            if parent_fitness[0] > parent_fitness[1]:
-                if offspring_fitness[1] > parent_fitness[0] or offspring_fitness[1] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[1]
-                    if offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
-                        population[indices[parent_indices[1]]] = offsprings[0]
-                elif offspring_fitness[1] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
-                    population[indices[parent_indices[1]]] = offsprings[1]
-            elif parent_fitness[0] < parent_fitness[1]:
-                if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
-                    population[indices[parent_indices[1]]] = offsprings[1]
-                    if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                        population[indices[parent_indices[0]]] = offsprings[0]
-                elif offspring_fitness[1] > parent_fitness[0] or offspring_fitness[1] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[1]
-            elif parent_fitness[0] == parent_fitness[1]:
-                if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-                    population[indices[parent_indices[1]]] = offsprings[1]
-                elif offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
-                    population[indices[parent_indices[1]]] = offsprings[1]
-
-        elif offspring_fitness[0] == offspring_fitness[1]:  # When offspring1 and offspring2 both equally good:
-            if parent_fitness[0] > parent_fitness[1]:
-                if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-                    population[indices[parent_indices[1]]] = offsprings[1]
-                elif offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
-                    population[indices[parent_indices[1]]] = offsprings[0]
-            elif parent_fitness[0] < parent_fitness[1]:
-                if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-                    population[indices[parent_indices[1]]] = offsprings[1]
-                elif offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-            elif parent_fitness[0] == parent_fitness[1]:
-                if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
-                    population[indices[parent_indices[0]]] = offsprings[0]
-                    population[indices[parent_indices[1]]] = offsprings[1]
-
-    fitness = cal_fitness(items[0], items[1], population, capacity)[0]
-    optimum = population[np.where(fitness == np.max(fitness))[0][0]]
-    value = np.sum(optimum * items[0])
-    weight = np.sum(optimum * items[1])
-    print("Optimised Population:\n", population)
-    print("Optimised Solution After", num_iteration,"Iteration:")
-    print("Optimum Chromosome:", optimum, "\nTotal Value:", value, "\nTotal Weight:", weight)
-    return optimum
-
-
-#       Item No: | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+# Main loop, finds optimum values with given iteration number:
+# Item No:       | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 items = np.array([[92, 57, 49, 68, 60, 43, 67, 84, 87, 72],  # Items profit values here.
                   [23, 31, 29, 44, 53, 38, 63, 85, 89, 82]]) # Items weight values here.
 capacity = 165 # Backpack weight capacity here.
-optimum = iteration(1000)
+num_iteration = 1000
+population = create_pop(8, items.shape[1])
+for _ in range(num_iteration):
+    fitness, indices = cal_fitness(items[0], items[1], population, capacity)
+    parents, parent_indices = selection(fitness, population)
+    parent_fitness = cal_fitness(items[0], items[1], parents, capacity)[0]
+    offsprings = crossover(parents)
+    offsprings = mutation(offsprings)
+    offspring_fitness = cal_fitness(items[0], items[1], offsprings, capacity)[0]
+
+    if offspring_fitness[0] > offspring_fitness[1]:  # When offspring1 is better than offspring2:
+        if parent_fitness[0] > parent_fitness[1]:
+            if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+                if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
+                    population[indices[parent_indices[1]]] = offsprings[1]
+            elif offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
+                population[indices[parent_indices[1]]] = offsprings[0]
+        elif parent_fitness[0] < parent_fitness[1]:
+            if offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
+                population[indices[parent_indices[1]]] = offsprings[0]
+                if offspring_fitness[1] > parent_fitness[0] or offspring_fitness[1] == parent_fitness[0]:
+                    population[indices[parent_indices[0]]] = offsprings[1]
+            elif offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+        elif parent_fitness[0] == parent_fitness[1]:
+            if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+                population[indices[parent_indices[1]]] = offsprings[1]
+            elif offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+
+    elif offspring_fitness[0] < offspring_fitness[1]:  # When offspring2 is better than offspring1:
+        if parent_fitness[0] > parent_fitness[1]:
+            if offspring_fitness[1] > parent_fitness[0] or offspring_fitness[1] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[1]
+                if offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
+                    population[indices[parent_indices[1]]] = offsprings[0]
+            elif offspring_fitness[1] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
+                population[indices[parent_indices[1]]] = offsprings[1]
+        elif parent_fitness[0] < parent_fitness[1]:
+            if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
+                population[indices[parent_indices[1]]] = offsprings[1]
+                if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                    population[indices[parent_indices[0]]] = offsprings[0]
+            elif offspring_fitness[1] > parent_fitness[0] or offspring_fitness[1] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[1]
+        elif parent_fitness[0] == parent_fitness[1]:
+            if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+                population[indices[parent_indices[1]]] = offsprings[1]
+            elif offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
+                population[indices[parent_indices[1]]] = offsprings[1]
+
+    elif offspring_fitness[0] == offspring_fitness[1]:  # When offspring1 and offspring2 both equally good:
+        if parent_fitness[0] > parent_fitness[1]:
+            if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+                population[indices[parent_indices[1]]] = offsprings[1]
+            elif offspring_fitness[0] > parent_fitness[1] or offspring_fitness[0] == parent_fitness[1]:
+                population[indices[parent_indices[1]]] = offsprings[0]
+        elif parent_fitness[0] < parent_fitness[1]:
+            if offspring_fitness[1] > parent_fitness[1] or offspring_fitness[1] == parent_fitness[1]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+                population[indices[parent_indices[1]]] = offsprings[1]
+            elif offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+        elif parent_fitness[0] == parent_fitness[1]:
+            if offspring_fitness[0] > parent_fitness[0] or offspring_fitness[0] == parent_fitness[0]:
+                population[indices[parent_indices[0]]] = offsprings[0]
+                population[indices[parent_indices[1]]] = offsprings[1]
+
+fitness = cal_fitness(items[0], items[1], population, capacity)[0]
+optimum = population[np.where(fitness == np.max(fitness))[0][0]]
+value = np.sum(optimum * items[0])
+weight = np.sum(optimum * items[1])
+print("Optimised Population:\n", population)
+print("Optimised Solution After", num_iteration,"Iteration:")
+print("Optimum Chromosome:", optimum, "\nTotal Value:", value, "\nTotal Weight:", weight)
