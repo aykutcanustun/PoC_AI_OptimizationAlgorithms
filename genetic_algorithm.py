@@ -5,13 +5,6 @@ import numpy as np
 def create_pop(pop_size, gene_num):
     population = np.random.randint(0, 2, gene_num*pop_size)
     population = population.reshape((pop_size, gene_num))
-    total = 0
-    for i in population:
-        if np.sum(i) > total:
-            total = np.sum(i)
-            optimum = i
-    print(f"Starting Population::\n{population}")
-    print(f"Unoptimised Best Value::{optimum}:[{np.sum(optimum)}]\n")
     return population
 
 
@@ -50,7 +43,7 @@ def select_parents(population, fitness, indices):
 # Using select_parents function, creates 2 childs:
 def crossover(p1, p2, gene_num):
     num_crossover = np.random.randint(1, 4)
-    c1, c2 = p1, p2
+    c1, c2 = p1.copy(), p2.copy()
     for _ in range(num_crossover):
         cutpoint = np.random.randint(1, gene_num)
         c1, c2 = np.append(c1[:cutpoint], c2[cutpoint:]), np.append(c2[:cutpoint], c1[cutpoint:])
@@ -70,88 +63,83 @@ def mutation(c1, c2, gene_num):
     return c1, c2
 
 
-# Finds optimum value with given iteration number:
-def iteration(num_iteration):
-    population = create_pop(8, 20)
-    for _ in range(num_iteration):
-        fitness, indices = cal_fitness(population)
-        p1, p1_indice, p2, p2_indice = select_parents(
-            population, fitness, indices)
-        c1, c2 = crossover(p1, p2, 20)
-        c1, c2 = mutation(c1, c2, 20)
-        p1_total, p2_total = np.sum(p1), np.sum(p2)
-        c1_total, c2_total = np.sum(c1), np.sum(c2)
+# Main loop, finds optimum values with given iteration number:
+num_iteration = 1000
+population = create_pop(8, 20)
+for _ in range(num_iteration):
+    fitness, indices = cal_fitness(population)
+    p1, p1_indice, p2, p2_indice = select_parents(population, fitness, indices)
+    c1, c2 = crossover(p1, p2, 20)
+    c1, c2 = mutation(c1, c2, 20)
+    p1_total, p2_total = np.sum(p1), np.sum(p2)
+    c1_total, c2_total = np.sum(c1), np.sum(c2)
 
-        if c1_total > c2_total:  # When child1 is better than child2:
-            if p1_total > p2_total:
-                if c1_total > p1_total or c1_total == p1_total:
-                    population[indices[p1_indice]] = c1
-                    if c2_total > p2_total or c2_total == p2_total:
-                        population[indices[p2_indice]] = c2
-                elif c1_total > p2_total or c1_total == p2_total:
-                    population[indices[p2_indice]] = c1
-            elif p1_total < p2_total:
-                if c1_total > p2_total or c1_total == p2_total:
-                    population[indices[p2_indice]] = c1
-                    if c2_total > p1_total or c2_total == p1_total:
-                        population[indices[p1_indice]] = c2
-                elif c1_total > p1_total or c1_total == p1_total:
-                    population[indices[p1_indice]] = c1
-            elif p1_total == p2_total:
+    if c1_total > c2_total:  # When child1 is better than child2:
+        if p1_total > p2_total:
+            if c1_total > p1_total or c1_total == p1_total:
+                population[indices[p1_indice]] = c1
                 if c2_total > p2_total or c2_total == p2_total:
-                    population[indices[p1_indice]] = c1
                     population[indices[p2_indice]] = c2
-                elif c1_total > p1_total or c1_total == p1_total:
-                    population[indices[p1_indice]] = c1
-
-        elif c1_total < c2_total:  # When child2 is better than child1:
-            if p1_total > p2_total:
+            elif c1_total > p2_total or c1_total == p2_total:
+                population[indices[p2_indice]] = c1
+        elif p1_total < p2_total:
+            if c1_total > p2_total or c1_total == p2_total:
+                population[indices[p2_indice]] = c1
                 if c2_total > p1_total or c2_total == p1_total:
                     population[indices[p1_indice]] = c2
-                    if c1_total > p2_total or c1_total == p2_total:
-                        population[indices[p2_indice]] = c1
-                elif c2_total > p2_total or c1_total == p2_total:
-                    population[indices[p2_indice]] = c2
-            elif p1_total < p2_total:
-                if c2_total > p2_total or c2_total == p2_total:
-                    population[indices[p2_indice]] = c2
-                    if c1_total > p1_total or c1_total == p1_total:
-                        population[indices[p1_indice]] = c1
-                elif c2_total > p1_total or c2_total == p1_total:
-                    population[indices[p1_indice]] = c2
-            elif p1_total == p2_total:
-                if c1_total > p1_total or c1_total == p1_total:
-                    population[indices[p1_indice]] = c1
-                    population[indices[p2_indice]] = c2
-                elif c2_total > p2_total or c2_total == p2_total:
-                    population[indices[p2_indice]] = c2
+            elif c1_total > p1_total or c1_total == p1_total:
+                population[indices[p1_indice]] = c1
+        elif p1_total == p2_total:
+            if c2_total > p2_total or c2_total == p2_total:
+                population[indices[p1_indice]] = c1
+                population[indices[p2_indice]] = c2
+            elif c1_total > p1_total or c1_total == p1_total:
+                population[indices[p1_indice]] = c1
 
-        elif c1_total == c2_total:  # When child1 and child2 both equally good:
-            if p1_total > p2_total:
-                if c1_total > p1_total or c1_total == p1_total:
-                    population[indices[p1_indice]] = c1
-                    population[indices[p2_indice]] = c2
-                elif c1_total > p2_total or c1_total == p2_total:
+    elif c1_total < c2_total:  # When child2 is better than child1:
+        if p1_total > p2_total:
+            if c2_total > p1_total or c2_total == p1_total:
+                population[indices[p1_indice]] = c2
+                if c1_total > p2_total or c1_total == p2_total:
                     population[indices[p2_indice]] = c1
-            elif p1_total < p2_total:
-                if c2_total > p2_total or c2_total == p2_total:
-                    population[indices[p1_indice]] = c1
-                    population[indices[p2_indice]] = c2
-                elif c1_total > p1_total or c1_total == p1_total:
-                    population[indices[p1_indice]] = c1
-            elif p1_total == p2_total:
+            elif c2_total > p2_total or c1_total == p2_total:
+                population[indices[p2_indice]] = c2
+        elif p1_total < p2_total:
+            if c2_total > p2_total or c2_total == p2_total:
+                population[indices[p2_indice]] = c2
                 if c1_total > p1_total or c1_total == p1_total:
                     population[indices[p1_indice]] = c1
-                    population[indices[p2_indice]] = c2
+            elif c2_total > p1_total or c2_total == p1_total:
+                population[indices[p1_indice]] = c2
+        elif p1_total == p2_total:
+            if c1_total > p1_total or c1_total == p1_total:
+                population[indices[p1_indice]] = c1
+                population[indices[p2_indice]] = c2
+            elif c2_total > p2_total or c2_total == p2_total:
+                population[indices[p2_indice]] = c2
 
-    total = 0
-    for i in population:
-        if np.sum(i) > total:
-            total = np.sum(i)
-            optimum = i
-    print(f"End Population After {num_iteration} Iteration::\n{population}")
-    print(f"Optimised Best Value::{optimum}:[{np.sum(optimum)}]")
-    return optimum
+    elif c1_total == c2_total:  # When child1 and child2 both equally good:
+        if p1_total > p2_total:
+            if c1_total > p1_total or c1_total == p1_total:
+                population[indices[p1_indice]] = c1
+                population[indices[p2_indice]] = c2
+            elif c1_total > p2_total or c1_total == p2_total:
+                population[indices[p2_indice]] = c1
+        elif p1_total < p2_total:
+            if c2_total > p2_total or c2_total == p2_total:
+                population[indices[p1_indice]] = c1
+                population[indices[p2_indice]] = c2
+            elif c1_total > p1_total or c1_total == p1_total:
+                population[indices[p1_indice]] = c1
+        elif p1_total == p2_total:
+            if c1_total > p1_total or c1_total == p1_total:
+                population[indices[p1_indice]] = c1
+                population[indices[p2_indice]] = c2
 
-
-optimum = iteration(5000)
+total = 0
+for i in population:
+    if np.sum(i) > total:
+        total = np.sum(i)
+        optimum = i
+print(f"End Population After {num_iteration} Iteration::\n{population}")
+print(f"Optimised Best Value::{optimum}:[{np.sum(optimum)}]")
